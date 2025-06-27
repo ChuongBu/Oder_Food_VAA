@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <Button
+        android:id="@+id/btnMonAn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Quản lý món ăn"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/btnNhanVien"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Quản lý nhân viên"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/btnDonHang"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Xem đơn hàng" />
+    <LinearLayout
+        android:id="@+id/layoutThongKe"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="📊 Thống kê doanh thu"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp"  android:layout_height="48dp" android:layout_width="48dp"/>
+
+        <EditText
+            android:id="@+id/edtNgayThongKe"
+            android:hint="Nhập ngày (yyyy-MM-dd)"
+            android:inputType="text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/btnThongKeNgay"
+            android:text="Thống kê theo ngày"
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/edtThangThongKe"
+            android:hint="Nhập tháng (yyyy-MM)"
+            android:inputType="text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"/>
+
+        <Button
+            android:id="@+id/btnThongKeThang"
+            android:text="Thống kê theo tháng"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/txtKetQuaThongKe"
+            android:text="Kết quả: "
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+</LinearLayout>
