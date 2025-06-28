@@ -18,6 +18,7 @@ import java.util.ArrayList;
 
 public class MenuMonAnActivity extends AppCompatActivity implements MonAnAdapter.OnMonClickListener {
 
+
     RecyclerView recyclerView;
     ArrayList<MonAn> list;
     MonAnAdapter adapter;
@@ -31,7 +32,7 @@ public class MenuMonAnActivity extends AppCompatActivity implements MonAnAdapter
         setContentView(R.layout.activity_menu_monan);
 
         recyclerView = findViewById(R.id.recyclerMonAnMenu);
-        db = new DatabaseHelper(this);
+        btnGioHang = findViewById(R.id.btnGioHang);
 
         // Nhận ID bàn được chọn
         idBan = getIntent().getIntExtra("idBan", -1);
@@ -43,17 +44,18 @@ public class MenuMonAnActivity extends AppCompatActivity implements MonAnAdapter
 
         // Khởi tạo giỏ hàng nếu cần
         if (GioHang.idBan != idBan) {
-            GioHang.clear(); // xóa giỏ cũ nếu bàn khác
+            GioHang.clear(); // Nếu chọn bàn khác thì xóa giỏ cũ
             GioHang.idBan = idBan;
         }
 
-        list = db.getDanhSachMonAn();
-        adapter = new MonAnAdapter(this, list, this);
+        db = DatabaseHelper.getInstance(this);
+        list = db.getDanhSachMonAn(); // ✅ đã đúng
 
+        adapter = new MonAnAdapter(this, list, this); // ✅ sửa ở đây
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        btnGioHang = findViewById(R.id.btnGioHang);
+
         btnGioHang.setOnClickListener(v -> {
             Intent intent = new Intent(this, GioHangActivity.class);
             intent.putExtra("idBan", idBan);
@@ -63,13 +65,21 @@ public class MenuMonAnActivity extends AppCompatActivity implements MonAnAdapter
 
     @Override
     public void onThemMonClick(MonAn monAn) {
-        GioHang.themMon(monAn);
-        Toast.makeText(this, monAn.getTen() + " đã được thêm", Toast.LENGTH_SHORT).show();
+        // ⚠️ Lấy lại món từ database theo ID để đảm bảo đầy đủ thông tin
+        MonAn monDu = db.getMonAnById(monAn.getId());
+        if (monDu != null) {
+            GioHang.themMonAn(monDu); // ✅ Thêm đúng dữ liệu đầy đủ
+            Toast.makeText(this, monDu.getTen() + " đã được thêm", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Lỗi: Không tìm thấy món!", Toast.LENGTH_SHORT).show();
+        }
     }
+
+
 
     @Override
     public void onBackPressed() {
-        // Khi nhấn back → quay lại chọn bàn
+        // Có thể reset giỏ nếu muốn, hoặc giữ lại
         super.onBackPressed();
     }
 }

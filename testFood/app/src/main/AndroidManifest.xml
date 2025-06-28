@@ -1,46 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-    <uses-permission android:name="android.permission.INTERNET" />
-
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.testfood">
 
     <application
         android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="Ứng dụng đặt đồ ăn"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.TestFood"
-        tools:targetApi="31">
-        <application
-            android:allowBackup="true"
-            android:label="App Order Food"
-            android:icon="@mipmap/ic_launcher"
-            android:theme="@style/Theme.OrderFood">
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
-            <!-- Màn hình chính khi khởi động ứng dụng -->
-            <activity android:name=".LoginActivity">
-                <intent-filter>
-                    <action android:name="android.intent.action.MAIN" />
-                    <category android:name="android.intent.category.LAUNCHER" />
-                </intent-filter>
-            </activity>
+        <!-- Màn hình khởi chạy chính -->
+        <activity android:name=".MainActivity"
+            android:exported="true"> <!-- Đây là activity chính khởi chạy -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
-            <!-- Các Activity khác -->
-            <activity android:name=".MainActivity" />
-            <activity android:name=".AdminActivity" />
-            <activity android:name=".NhanVienActivity" />
-            <activity android:name=".QuanLyMonAnActivity" />
-            <activity android:name=".QuanLyNhanVienActivity" />
-            <activity android:name=".MenuMonAnActivity" />
-            <activity android:name=".GioHangActivity" />
-            <activity android:name=".ThanhToanActivity" />
-            <activity android:name=".XemDonHangActivity" />
-            <activity android:name=".DonHangDetailActivity" />
-            <activity android:name=".ChonBanActivity" />
-        </application>
+        <!-- Đăng nhập / Đăng ký -->
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".RegisterActivity" />
+
+        <!-- Giao diện chính theo vai trò -->
+        <activity android:name=".AdminActivity" />
+        <activity android:name=".NhanVienActivity" />
+
+        <!-- Giao diện quản lý cho Admin -->
+        <activity android:name=".QuanLyMonAnActivity" />
+        <activity android:name=".QuanLyNhanVienActivity" />
+        <activity android:name=".XemDonHangActivity" />
+
+        <!-- Giao diện chọn bàn và đặt món cho nhân viên -->
+        <activity android:name=".ChonBanActivity" />
+        <activity android:name=".MenuMonAnActivity" />
+        <activity android:name=".GioHangActivity" />
+        <activity android:name=".ThanhToanActivity" />
+        <activity android:name=".DonHangDetailActivity" />
+
+        <activity android:name=".AddMonAnActivity" />
+        <activity android:name=".EditMonAnActivity" />
+
 
     </application>
 

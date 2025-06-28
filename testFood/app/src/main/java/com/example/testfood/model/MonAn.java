@@ -1,6 +1,8 @@
 package com.example.testfood.model;
 
-public class MonAn {
+import java.io.Serializable;
+
+public class MonAn implements Serializable {
     private int id;
     private String ten;
     private int gia;
@@ -8,11 +10,24 @@ public class MonAn {
     private String moTa;
     private int soLuong;
 
-    public MonAn(int anInt, String string, int anInt1) {
-
+    public MonAn(int id, String ten, int gia, String hinhAnh) {
+        this.id = id;
+        this.ten = ten;
+        this.gia = gia;
+        this.hinhAnh = hinhAnh;
+        this.moTa = moTa;
+        this.soLuong = soLuong;
     }
 
-    // Getters & Setters
+
+    public MonAn(int id, String ten, int gia, int soLuong) {
+        this.id = id;
+        this.ten = ten;
+        this.gia = gia;
+        this.soLuong = soLuong;
+    }
+
+    // Getters và Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

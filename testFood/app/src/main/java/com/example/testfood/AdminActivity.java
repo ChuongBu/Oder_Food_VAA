@@ -13,21 +13,17 @@ import com.example.testfood.SQLite.DatabaseHelper;
 
 public class AdminActivity extends AppCompatActivity {
 
-    Button btnMonAn, btnNhanVien, btnDonHang;
-
     EditText edtNgayThongKe, edtThangThongKe;
-    Button btnThongKeNgay, btnThongKeThang;
     TextView txtKetQuaThongKe;
+    Button btnThongKeNgay, btnThongKeThang;
+    Button btnMonAn, btnNhanVien, btnDonHang;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
-        edtNgayThongKe = findViewById(R.id.edtNgayThongKe);
-        edtThangThongKe = findViewById(R.id.edtThangThongKe);
-        btnThongKeNgay = findViewById(R.id.btnThongKeNgay);
-        btnThongKeThang = findViewById(R.id.btnThongKeThang);
-        txtKetQuaThongKe = findViewById(R.id.txtKetQuaThongKe);
+
+        initView();
 
         DatabaseHelper db = DatabaseHelper.getInstance(this);
 
@@ -51,13 +47,19 @@ public class AdminActivity extends AppCompatActivity {
             txtKetQuaThongKe.setText("📆 Doanh thu tháng " + thang + ": " + doanhThu + " VNĐ");
         });
 
-        btnMonAn = findViewById(R.id.btnMonAn);
-        btnNhanVien = findViewById(R.id.btnNhanVien);
-        btnDonHang = findViewById(R.id.btnDonHang);
-
         btnMonAn.setOnClickListener(v -> startActivity(new Intent(this, QuanLyMonAnActivity.class)));
         btnNhanVien.setOnClickListener(v -> startActivity(new Intent(this, QuanLyNhanVienActivity.class)));
         btnDonHang.setOnClickListener(v -> startActivity(new Intent(this, XemDonHangActivity.class)));
     }
 
+    private void initView() {
+        edtNgayThongKe = findViewById(R.id.edtNgayThongKe);
+        edtThangThongKe = findViewById(R.id.edtThangThongKe);
+        btnThongKeNgay = findViewById(R.id.btnThongKeNgay);
+        btnThongKeThang = findViewById(R.id.btnThongKeThang);
+        txtKetQuaThongKe = findViewById(R.id.txtKetQuaThongKe);
+        btnMonAn = findViewById(R.id.btnMonAn);
+        btnNhanVien = findViewById(R.id.btnNhanVien);
+        btnDonHang = findViewById(R.id.btnDonHang);
+    }
 }

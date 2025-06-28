@@ -6,23 +6,26 @@
     android:layout_width="100dp"
     android:layout_height="100dp"
     android:padding="10dp"
-    android:background="@android:color/holo_blue_light">
+    android:background="@drawable/bg_ban_tron"
+    android:elevation="4dp">
 
     <TextView
         android:id="@+id/txtSoBan"
         android:text="Bàn 1"
         android:textSize="18sp"
-        android:textColor="@android:color/white"
         android:textStyle="bold"
-        android:layout_gravity="center"
-        android:layout_height="48dp"
-        android:layout_width="48dp"/>
+        android:textColor="#FFFFFF"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/txtTrangThai"
         android:text="Trống"
-        android:textColor="@android:color/white"
-        android:layout_gravity="center"
-        android:layout_height="48dp"
-        android:layout_width="48dp"/>
+        android:textSize="14sp"
+        android:textColor="#FFEB3B"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 </LinearLayout>

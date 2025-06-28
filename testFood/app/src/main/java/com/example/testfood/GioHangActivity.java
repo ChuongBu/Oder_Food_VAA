@@ -21,52 +21,70 @@ public class GioHangActivity extends AppCompatActivity {
     GioHangAdapter adapter;
     TextView txtTongTien;
     Button btnThanhToan, btnQuayLai, btnGoiMon;
+    int idBan;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_giohang);
-        btnGoiMon.setOnClickListener(v -> {
-            if (GioHang.danhSachGioHang.isEmpty()) {
-                Toast.makeText(this, "Giỏ hàng trống", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            DatabaseHelper db = new DatabaseHelper(this);
-            int idDonHang = db.themDonHang(GioHang.idBan, GioHang.tinhTongTien());
-
-            for (MonAn m : GioHang.danhSachGioHang) {
-                db.themChiTietDonHang(idDonHang, m.getId(), m.getSoLuong());
-            }
-
-            // Cập nhật trạng thái bàn → phần 3
-            db.capNhatTrangThaiBan(GioHang.idBan, "Đang phục vụ");
-
-            Toast.makeText(this, "Gọi món thành công", Toast.LENGTH_SHORT).show();
-
-            // Xóa giỏ hàng sau khi gọi món
-            GioHang.clear();
-
-            // Quay lại chọn bàn
-            finish();
-        });
-
 
         recyclerGioHang = findViewById(R.id.recyclerGioHang);
         txtTongTien = findViewById(R.id.txtTongTien);
         btnThanhToan = findViewById(R.id.btnThanhToan);
         btnQuayLai = findViewById(R.id.btnQuayLai);
+        btnGoiMon = findViewById(R.id.btnGoiMon);
 
-        adapter = new GioHangAdapter(GioHang.getDsMonAn(), this, txtTongTien);
+        // Lấy ID bàn từ intent
+        idBan = getIntent().getIntExtra("idBan", -1);
+        if (idBan == -1) {
+            Toast.makeText(this, "Không xác định được bàn!", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        // Đảm bảo giỏ hàng đúng với bàn đang phục vụ
+        if (GioHang.idBan != idBan) {
+            GioHang.idBan = idBan;
+        }
+
+        adapter = new GioHangAdapter(GioHang.getDanhSachGioHang(), this, txtTongTien);
         recyclerGioHang.setLayoutManager(new LinearLayoutManager(this));
         recyclerGioHang.setAdapter(adapter);
 
         txtTongTien.setText("Tổng: " + GioHang.tinhTongTien() + " VNĐ");
 
-        btnThanhToan.setOnClickListener(v ->
-                startActivity(new Intent(this, ThanhToanActivity.class))
-        );
+        btnThanhToan.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ThanhToanActivity.class);
+            intent.putExtra("idBan", idBan);
+            startActivity(intent);
+        });
 
         btnQuayLai.setOnClickListener(v -> finish());
+
+        btnGoiMon.setOnClickListener(v -> {
+            if (GioHang.getDanhSachGioHang().isEmpty()) {
+                Toast.makeText(this, "Giỏ hàng trống", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            btnGoiMon.setEnabled(false);
+
+            DatabaseHelper db = DatabaseHelper.getInstance(this);
+            int idDonHang = db.themDonHang(GioHang.idBan, GioHang.tinhTongTien());
+            for (MonAn m : GioHang.getDanhSachGioHang()) {
+                db.themChiTietDonHang(idDonHang, m.getId(), m.getSoLuong());
+            }
+
+            db.capNhatTrangThaiBan(GioHang.idBan, "Đang phục vụ");
+            Toast.makeText(this, "Gọi món thành công", Toast.LENGTH_SHORT).show();
+
+            GioHang.clear(); // 👉 Không reset idBan bên trong
+
+            // Quay về màn danh sách bàn (nhân viên)
+            Intent intent = new Intent(this, NhanVienActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        });
     }
 }

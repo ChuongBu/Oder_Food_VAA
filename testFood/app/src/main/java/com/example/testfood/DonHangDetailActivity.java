@@ -29,7 +29,8 @@ public class DonHangDetailActivity extends AppCompatActivity {
 
         listView = findViewById(R.id.listChiTiet);
         txtTitle = findViewById(R.id.txtDonHangInfo);
-        db = new DatabaseHelper(this);
+        DatabaseHelper db = DatabaseHelper.getInstance(this);
+
 
         idDonHang = getIntent().getIntExtra("idDonHang", -1);
         ArrayList<ChiTietDonHang> list = db.getChiTietDonHang(idDonHang);

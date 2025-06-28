@@ -6,15 +6,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.testfood.MenuMonAnActivity;
 import com.example.testfood.R;
 import com.example.testfood.model.MonAn;
-import com.example.testfood.utils.GioHang;
 
 import java.util.ArrayList;
 
@@ -22,10 +19,12 @@ public class MonAnAdapter extends RecyclerView.Adapter<MonAnAdapter.MonAnViewHol
 
     Context context;
     ArrayList<MonAn> list;
+    OnMonClickListener listener;
 
-    public MonAnAdapter(Context context, ArrayList<MonAn> list, MenuMonAnActivity menuMonAnActivity) {
+    public MonAnAdapter(Context context, ArrayList<MonAn> list, OnMonClickListener listener) {
         this.context = context;
         this.list = list;
+        this.listener = listener;
     }
 
     @NonNull
@@ -41,8 +40,9 @@ public class MonAnAdapter extends RecyclerView.Adapter<MonAnAdapter.MonAnViewHol
         holder.txtGia.setText(monAn.getGia() + " VNĐ");
 
         holder.btnThem.setOnClickListener(v -> {
-            GioHang.themMonAn(monAn); // static class quản lý giỏ hàng
-            Toast.makeText(context, "Đã thêm " + monAn.getTen(), Toast.LENGTH_SHORT).show();
+            if (listener != null) {
+                listener.onThemMonClick(monAn); // gửi món được chọn về Activity xử lý
+            }
         });
     }
 

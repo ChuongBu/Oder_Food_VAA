@@ -1,22 +1,24 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:padding="16dp"
+    android:background="#FFF3E0"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/txtTongTien"
-        android:text="Tổng tiền: "
+        android:text="💰 Tổng tiền: "
         android:textSize="18sp"
         android:textStyle="bold"
+        android:textColor="#BF360C"
         android:layout_marginBottom="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <TextView
-        android:text="Chọn phương thức thanh toán:"
+        android:text="💳 Chọn phương thức thanh toán:"
         android:textSize="16sp"
+        android:textColor="#5D4037"
         android:layout_marginBottom="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
@@ -29,22 +31,24 @@
             android:id="@+id/rdoTienMat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tiền mặt" />
+            android:text="💵 Tiền mặt" />
         <RadioButton
             android:id="@+id/rdoChuyenKhoan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chuyển khoản" />
+            android:text="🏦 Chuyển khoản" />
         <RadioButton
             android:id="@+id/rdoMomo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Momo/ZaloPay" />
+            android:text="📱 Momo/ZaloPay" />
     </RadioGroup>
 
     <Button
         android:id="@+id/btnXacNhanThanhToan"
-        android:text="Xác nhận thanh toán"
+        android:text="✅ Xác nhận thanh toán"
+        android:backgroundTint="#FF5722"
+        android:textColor="#FFFFFF"
         android:layout_marginTop="24dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

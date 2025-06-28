@@ -11,7 +11,7 @@ import java.util.*;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    public static final String DB_NAME = "OrderFood.db";
+    public static final String DB_NAME = "OrderFoodd.db";
     public static final int DB_VERSION = 1;
 
     private static DatabaseHelper instance;
@@ -27,10 +27,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         super(context, DB_NAME, null, DB_VERSION);
     }
 
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE User (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, role TEXT)");
-        db.execSQL("CREATE TABLE MonAn (id INTEGER PRIMARY KEY AUTOINCREMENT, ten TEXT, gia INTEGER)");
+        db.execSQL("CREATE TABLE MonAn (id INTEGER PRIMARY KEY AUTOINCREMENT, ten TEXT, gia INTEGER, hinhAnh TEXT)");
         db.execSQL("CREATE TABLE NhanVien (id INTEGER PRIMARY KEY AUTOINCREMENT, tenNV TEXT, sdt TEXT)");
         db.execSQL("CREATE TABLE BanAn (id INTEGER PRIMARY KEY AUTOINCREMENT, soBan INTEGER, trangThai TEXT)");
         db.execSQL("CREATE TABLE DonHang (id INTEGER PRIMARY KEY AUTOINCREMENT, idBan INTEGER, ngay TEXT, tongTien REAL)");
@@ -39,8 +40,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Dữ liệu mẫu
         db.execSQL("INSERT INTO User(username, password, role) VALUES ('admin','123','admin'), ('nv1','123','nhanvien')");
         db.execSQL("INSERT INTO BanAn(soBan, trangThai) VALUES (1, 'Trống'), (2, 'Trống'), (3, 'Trống')");
-        db.execSQL("INSERT INTO MonAn(ten, gia) VALUES ('Pizza', 120000), ('Coca', 15000), ('Salad', 40000)");
+        db.execSQL("INSERT INTO MonAn(ten, gia, hinhAnh) VALUES " +
+                "('Pizza', 120000, 'pizza.png'), " +
+                "('Coca', 15000, 'coca.png'), " +
+                "('Salad', 40000, 'salad.png')");
     }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -50,7 +55,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS BanAn");
         db.execSQL("DROP TABLE IF EXISTS DonHang");
         db.execSQL("DROP TABLE IF EXISTS ChiTietDonHang");
-        onCreate(db);
+
+        onCreate(db); // tạo lại bảng với cấu trúc mới
+    }
+
+    // Kiểm tra tài khoản đã tồn tại
+    public boolean kiemTraTaiKhoanTonTai(String username) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM User WHERE username = ?", new String[]{username});
+        boolean tonTai = c.moveToFirst();
+        c.close();
+        return tonTai;
+    }
+
+    // Hàm đăng ký tài khoản mới cho admin (true = thành công, false = thất bại)
+    public boolean dangKyAdmin(String username, String password) {
+        if (kiemTraTaiKhoanTonTai(username)) {
+            return false; // tài khoản đã tồn tại
+        }
+
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("username", username);
+        values.put("password", password);
+        values.put("role", "admin");
+
+        long result = db.insert("User", null, values);
+        return result != -1;
     }
 
     // ==== USER ====
@@ -62,21 +93,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return null;
     }
-
-    // ==== MON AN ====
-    public void themMonAn(String ten, int gia) {
+    public void capNhatMonAn(MonAn mon) {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("INSERT INTO MonAn(ten, gia) VALUES (?, ?)", new Object[]{ten, gia});
+        ContentValues values = new ContentValues();
+        values.put("ten", mon.getTen());
+        values.put("gia", mon.getGia());
+        values.put("hinhAnh", mon.getHinhAnh());
+        db.update("MonAn", values, "id = ?", new String[]{String.valueOf(mon.getId())});
     }
 
-    public void suaMonAn(int id, String ten, int gia) {
+
+    // ==== MON AN ====
+    public void themMonAn(MonAn mon) {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("UPDATE MonAn SET ten=?, gia=? WHERE id=?", new Object[]{ten, gia, id});
+        ContentValues values = new ContentValues();
+        values.put("ten", mon.getTen());
+        values.put("gia", mon.getGia());
+        values.put("hinhAnh", mon.getHinhAnh());
+        db.insert("MonAn", null, values);
+    }
+
+    public void suaMonAn(MonAn mon) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("ten", mon.getTen());
+        values.put("gia", mon.getGia());
+        values.put("hinhAnh", mon.getHinhAnh());
+        db.update("MonAn", values, "id=?", new String[]{String.valueOf(mon.getId())});
     }
 
     public void xoaMonAn(int id) {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("DELETE FROM MonAn WHERE id=?", new Object[]{id});
+        db.delete("MonAn", "id=?", new String[]{String.valueOf(id)});
     }
 
     public ArrayList<MonAn> getDanhSachMonAn() {
@@ -84,8 +132,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM MonAn", null);
         while (c.moveToNext()) {
-            list.add(new MonAn(c.getInt(0), c.getString(1), c.getInt(2)));
+            MonAn mon = new MonAn(
+                    c.getInt(c.getColumnIndexOrThrow("id")),
+                    c.getString(c.getColumnIndexOrThrow("ten")),
+                    c.getInt(c.getColumnIndexOrThrow("gia")),
+                    c.getString(c.getColumnIndexOrThrow("hinhAnh"))
+            );
+            list.add(mon);
         }
+        c.close();
         return list;
     }
 
@@ -93,10 +148,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM MonAn WHERE id=?", new String[]{String.valueOf(id)});
         if (c.moveToFirst()) {
-            return new MonAn(c.getInt(0), c.getString(1), c.getInt(2));
+            MonAn mon = new MonAn(
+                    c.getInt(c.getColumnIndexOrThrow("id")),
+                    c.getString(c.getColumnIndexOrThrow("ten")),
+                    c.getInt(c.getColumnIndexOrThrow("gia")),
+                    c.getString(c.getColumnIndexOrThrow("hinhAnh"))
+            );
+            c.close();
+            return mon;
         }
+        c.close();
         return null;
     }
+
+
 
     // ==== NHAN VIEN ====
     public void themNhanVien(String ten, String sdt) {
@@ -121,6 +186,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         while (c.moveToNext()) {
             list.add(new NhanVien(c.getInt(0), c.getString(1), c.getString(2)));
         }
+        c.close();
         return list;
     }
 
@@ -132,8 +198,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         while (c.moveToNext()) {
             list.add(new BanAn(c.getInt(0), c.getInt(1), c.getString(2)));
         }
+        c.close(); // ✅ thêm dòng này
         return list;
     }
+
 
     public void capNhatTrangThaiBan(int idBan, String trangThai) {
         SQLiteDatabase db = getWritableDatabase();
