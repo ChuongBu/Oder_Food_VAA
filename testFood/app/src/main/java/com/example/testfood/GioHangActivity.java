@@ -23,6 +23,8 @@ public class GioHangActivity extends AppCompatActivity {
     Button btnThanhToan, btnQuayLai, btnGoiMon;
     int idBan;
 
+    boolean daGoiMon = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +36,6 @@ public class GioHangActivity extends AppCompatActivity {
         btnQuayLai = findViewById(R.id.btnQuayLai);
         btnGoiMon = findViewById(R.id.btnGoiMon);
 
-        // Lấy ID bàn từ intent
         idBan = getIntent().getIntExtra("idBan", -1);
         if (idBan == -1) {
             Toast.makeText(this, "Không xác định được bàn!", Toast.LENGTH_SHORT).show();
@@ -42,7 +43,6 @@ public class GioHangActivity extends AppCompatActivity {
             return;
         }
 
-        // Đảm bảo giỏ hàng đúng với bàn đang phục vụ
         if (GioHang.idBan != idBan) {
             GioHang.idBan = idBan;
         }
@@ -53,38 +53,47 @@ public class GioHangActivity extends AppCompatActivity {
 
         txtTongTien.setText("Tổng: " + GioHang.tinhTongTien() + " VNĐ");
 
-        btnThanhToan.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ThanhToanActivity.class);
-            intent.putExtra("idBan", idBan);
-            startActivity(intent);
-        });
-
-        btnQuayLai.setOnClickListener(v -> finish());
-
         btnGoiMon.setOnClickListener(v -> {
             if (GioHang.getDanhSachGioHang().isEmpty()) {
                 Toast.makeText(this, "Giỏ hàng trống", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            btnGoiMon.setEnabled(false);
+            if (daGoiMon) {
+                Toast.makeText(this, "Đã gọi món trước đó!", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             DatabaseHelper db = DatabaseHelper.getInstance(this);
-            int idDonHang = db.themDonHang(GioHang.idBan, GioHang.tinhTongTien());
+            int idDonHang = db.themDonHang(idBan, GioHang.tinhTongTien());
             for (MonAn m : GioHang.getDanhSachGioHang()) {
                 db.themChiTietDonHang(idDonHang, m.getId(), m.getSoLuong());
             }
 
-            db.capNhatTrangThaiBan(GioHang.idBan, "Đang phục vụ");
-            Toast.makeText(this, "Gọi món thành công", Toast.LENGTH_SHORT).show();
+            db.capNhatTrangThaiBan(idBan, "Đang phục vụ");
+            Toast.makeText(this, "Gọi món thành công. Bạn có thể thanh toán khi cần.", Toast.LENGTH_SHORT).show();
 
-            GioHang.clear(); // 👉 Không reset idBan bên trong
-
-            // Quay về màn danh sách bàn (nhân viên)
-            Intent intent = new Intent(this, NhanVienActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            finish();
+            daGoiMon = true;
         });
+
+        btnThanhToan.setOnClickListener(v -> {
+            if (GioHang.getDanhSachGioHang().isEmpty()) {
+                Toast.makeText(this, "Không có món nào để thanh toán", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!daGoiMon) {
+                Toast.makeText(this, "Vui lòng gọi món trước khi thanh toán!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // ➤ Chuyển sang màn hình chọn phương thức thanh toán
+            Intent intent = new Intent(this, ThanhToanActivity.class);
+            intent.putExtra("idBan", idBan);
+            intent.putExtra("tongTien", GioHang.tinhTongTien());
+            startActivity(intent);
+        });
+
+        btnQuayLai.setOnClickListener(v -> finish());
     }
 }
