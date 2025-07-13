@@ -24,9 +24,22 @@ public class AddMonAnActivity extends AppCompatActivity {
         btnThem = findViewById(R.id.btnThemMon);
 
         btnThem.setOnClickListener(v -> {
-            String ten = edtTen.getText().toString();
-            String hinh = edtHinh.getText().toString();
-            int gia = Integer.parseInt(edtGia.getText().toString());
+            String ten = edtTen.getText().toString().trim();
+            String hinh = edtHinh.getText().toString().trim().toLowerCase();
+            String giaStr = edtGia.getText().toString().trim();
+
+            if (ten.isEmpty() || giaStr.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập đầy đủ!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            int gia = Integer.parseInt(giaStr);
+            int resId = getResources().getIdentifier(hinh, "drawable", getPackageName());
+
+            if (resId == 0) {
+                Toast.makeText(this, "Ảnh không tồn tại trong drawable!", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             MonAn mon = new MonAn(0, ten, gia, hinh);
             DatabaseHelper db = DatabaseHelper.getInstance(this);

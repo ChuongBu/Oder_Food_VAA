@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -39,9 +40,19 @@ public class MonAnAdapter extends RecyclerView.Adapter<MonAnAdapter.MonAnViewHol
         holder.txtTen.setText(monAn.getTen());
         holder.txtGia.setText(monAn.getGia() + " VNĐ");
 
+        // Load ảnh từ drawable
+        int resId = context.getResources().getIdentifier(
+                monAn.getHinhAnh(), "drawable", context.getPackageName());
+
+        if (resId != 0) {
+            holder.imgMonAn.setImageResource(resId);
+        } else {
+            holder.imgMonAn.setImageResource(R.drawable.default_food); // ảnh mặc định nếu sai tên
+        }
+
         holder.btnThem.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onThemMonClick(monAn); // gửi món được chọn về Activity xử lý
+                listener.onThemMonClick(monAn);
             }
         });
     }
@@ -57,12 +68,14 @@ public class MonAnAdapter extends RecyclerView.Adapter<MonAnAdapter.MonAnViewHol
 
     public static class MonAnViewHolder extends RecyclerView.ViewHolder {
         TextView txtTen, txtGia;
+        ImageView imgMonAn;
         Button btnThem;
 
         public MonAnViewHolder(@NonNull View itemView) {
             super(itemView);
             txtTen = itemView.findViewById(R.id.txtTen);
             txtGia = itemView.findViewById(R.id.txtGia);
+            imgMonAn = itemView.findViewById(R.id.imgMonAn);
             btnThem = itemView.findViewById(R.id.btnThem);
         }
     }

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.*;
+
 import com.example.testfood.model.*;
 
 import java.text.SimpleDateFormat;
@@ -12,7 +13,7 @@ import java.util.*;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "OrderFoodd.db";
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 2;
 
     private static DatabaseHelper instance;
 
@@ -27,7 +28,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         super(context, DB_NAME, null, DB_VERSION);
     }
 
-
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE User (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, role TEXT)");
@@ -41,11 +41,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO User(username, password, role) VALUES ('admin','123','admin'), ('nv1','123','nhanvien')");
         db.execSQL("INSERT INTO BanAn(soBan, trangThai) VALUES (1, 'Trống'), (2, 'Trống'), (3, 'Trống')");
         db.execSQL("INSERT INTO MonAn(ten, gia, hinhAnh) VALUES " +
-                "('Pizza', 120000, 'pizza.png'), " +
-                "('Coca', 15000, 'coca.png'), " +
-                "('Salad', 40000, 'salad.png')");
+                "('Pizza', 120000, 'pizza'), " +
+                "('Coca', 15000, 'coca'), " +
+                "('Salad', 40000, 'salad'), " +
+                "('Chicken', 50000, 'chicken')");
     }
-
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -55,11 +55,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS BanAn");
         db.execSQL("DROP TABLE IF EXISTS DonHang");
         db.execSQL("DROP TABLE IF EXISTS ChiTietDonHang");
-
-        onCreate(db); // tạo lại bảng với cấu trúc mới
+        onCreate(db);
     }
 
-    // Kiểm tra tài khoản đã tồn tại
+    // ==== USER ====
     public boolean kiemTraTaiKhoanTonTai(String username) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM User WHERE username = ?", new String[]{username});
@@ -68,31 +67,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return tonTai;
     }
 
-    // Hàm đăng ký tài khoản mới cho admin (true = thành công, false = thất bại)
     public boolean dangKyAdmin(String username, String password) {
-        if (kiemTraTaiKhoanTonTai(username)) {
-            return false; // tài khoản đã tồn tại
-        }
-
+        if (kiemTraTaiKhoanTonTai(username)) return false;
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("username", username);
         values.put("password", password);
         values.put("role", "admin");
-
-        long result = db.insert("User", null, values);
-        return result != -1;
+        return db.insert("User", null, values) != -1;
     }
 
-    // ==== USER ====
     public User kiemTraDangNhap(String user, String pass) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM User WHERE username=? AND password=?", new String[]{user, pass});
         if (c.moveToFirst()) {
             return new User(c.getInt(0), c.getString(1), c.getString(2), c.getString(3));
         }
+        c.close();
         return null;
     }
+
     public void capNhatMonAn(MonAn mon) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -132,13 +126,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM MonAn", null);
         while (c.moveToNext()) {
-            MonAn mon = new MonAn(
+            list.add(new MonAn(
                     c.getInt(c.getColumnIndexOrThrow("id")),
                     c.getString(c.getColumnIndexOrThrow("ten")),
                     c.getInt(c.getColumnIndexOrThrow("gia")),
                     c.getString(c.getColumnIndexOrThrow("hinhAnh"))
-            );
-            list.add(mon);
+            ));
         }
         c.close();
         return list;
@@ -149,19 +142,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor c = db.rawQuery("SELECT * FROM MonAn WHERE id=?", new String[]{String.valueOf(id)});
         if (c.moveToFirst()) {
             MonAn mon = new MonAn(
-                    c.getInt(c.getColumnIndexOrThrow("id")),
-                    c.getString(c.getColumnIndexOrThrow("ten")),
-                    c.getInt(c.getColumnIndexOrThrow("gia")),
-                    c.getString(c.getColumnIndexOrThrow("hinhAnh"))
+                    c.getInt(0),
+                    c.getString(1),
+                    c.getInt(2),
+                    c.getString(3)
             );
             c.close();
             return mon;
         }
-        c.close();
         return null;
     }
-
-
 
     // ==== NHAN VIEN ====
     public void themNhanVien(String ten, String sdt) {
@@ -198,10 +188,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         while (c.moveToNext()) {
             list.add(new BanAn(c.getInt(0), c.getInt(1), c.getString(2)));
         }
-        c.close(); // ✅ thêm dòng này
+        c.close();
         return list;
     }
-
 
     public void capNhatTrangThaiBan(int idBan, String trangThai) {
         SQLiteDatabase db = getWritableDatabase();
@@ -214,6 +203,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             return new BanAn(c.getInt(0), c.getInt(1), c.getString(2));
         }
+        c.close();
         return null;
     }
 
@@ -239,6 +229,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     c.getDouble(3)
             ));
         }
+        c.close();
         return list;
     }
 
@@ -259,14 +250,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         while (c.moveToNext()) {
             list.add(new ChiTietDonHang(c.getInt(0), c.getInt(1), c.getInt(2), c.getInt(3)));
         }
+        c.close();
         return list;
     }
 
-    // ==== THỐNG KÊ DOANH THU ====
+    // ==== THỐNG KÊ ====
     public double getDoanhThuTheoNgay(String ngay) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT SUM(tongTien) FROM DonHang WHERE ngay LIKE ?", new String[]{ngay + "%"});
         if (c.moveToFirst()) return c.getDouble(0);
+        c.close();
         return 0;
     }
 
@@ -274,6 +267,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT SUM(tongTien) FROM DonHang WHERE ngay LIKE ?", new String[]{thangNam + "%"});
         if (c.moveToFirst()) return c.getDouble(0);
+        c.close();
         return 0;
     }
 
@@ -281,6 +275,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor c = db.rawQuery("SELECT SUM(tongTien) FROM DonHang WHERE date(ngay) BETWEEN ? AND ?", new String[]{tuNgay, denNgay});
         if (c.moveToFirst()) return c.getDouble(0);
+        c.close();
         return 0;
     }
 }

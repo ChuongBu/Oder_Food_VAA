@@ -8,6 +8,15 @@
     android:background="@drawable/bg_item_monan"
     android:elevation="3dp">
 
+    <!-- Ảnh món ăn -->
+    <ImageView
+        android:id="@+id/imgMonAn"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/default_food"
+        android:layout_marginEnd="12dp" />
+
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"

@@ -15,16 +15,17 @@ public class MonAn implements Serializable {
         this.ten = ten;
         this.gia = gia;
         this.hinhAnh = hinhAnh;
-        this.moTa = moTa;
-        this.soLuong = soLuong;
+        this.moTa = "";       // gán mặc định
+        this.soLuong = 1;     // gán mặc định
     }
-
 
     public MonAn(int id, String ten, int gia, int soLuong) {
         this.id = id;
         this.ten = ten;
         this.gia = gia;
         this.soLuong = soLuong;
+        this.moTa = "";
+        this.hinhAnh = "";
     }
 
     // Getters và Setters

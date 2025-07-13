@@ -31,17 +31,36 @@ public class EditMonAnActivity extends AppCompatActivity {
             edtTen.setText(monAn.getTen());
             edtGia.setText(String.valueOf(monAn.getGia()));
             edtHinh.setText(monAn.getHinhAnh());
+
+            btnCapNhat.setVisibility(Button.VISIBLE);
+            btnXoa.setVisibility(Button.VISIBLE);
         }
 
         DatabaseHelper db = DatabaseHelper.getInstance(this);
 
-
         btnCapNhat.setOnClickListener(v -> {
-            monAn.setTen(edtTen.getText().toString());
-            monAn.setGia(Integer.parseInt(edtGia.getText().toString()));
-            monAn.setHinhAnh(edtHinh.getText().toString());
+            String ten = edtTen.getText().toString().trim();
+            String hinh = edtHinh.getText().toString().trim().toLowerCase();
+            String giaStr = edtGia.getText().toString().trim();
 
+            if (ten.isEmpty() || giaStr.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập đầy đủ!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            int gia = Integer.parseInt(giaStr);
+            int resId = getResources().getIdentifier(hinh, "drawable", getPackageName());
+
+            if (resId == 0) {
+                Toast.makeText(this, "Ảnh không tồn tại trong drawable!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            monAn.setTen(ten);
+            monAn.setGia(gia);
+            monAn.setHinhAnh(hinh);
             db.capNhatMonAn(monAn);
+
             Toast.makeText(this, "Đã cập nhật!", Toast.LENGTH_SHORT).show();
             finish();
         });
